@@ -27,6 +27,7 @@ export default function Home() {
           <Input type="text" placeholder="Year" />
         </div>
       </div>
+      <div className="mt-5 grid grid-cols-4 gap-3"></div>
     </div>
   );
 }
