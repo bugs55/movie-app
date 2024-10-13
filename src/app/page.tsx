@@ -1,3 +1,4 @@
+import MovieCard from "@/components/MovieCard";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -7,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export default function Home() {
+export default async function Home() {
   return (
     <div className="px-5">
       <div className="w-full flex gap-2">
