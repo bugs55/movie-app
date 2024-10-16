@@ -21,7 +21,7 @@ type FilterType = {
   year: string;
 };
 
-export default async function Home() {
+export default function Home() {
   const [filters, setFilters] = useState<FilterType>({
     genre: "",
     sortBy: "popularity.desc",
@@ -58,7 +58,7 @@ export default async function Home() {
             <SelectContent>
               {
                 genresData &&
-                genresData.map((genre) => (
+                genresData?.map((genre) => (
                   <SelectItem key={genre.id} value={`${genre.id}`}>
                     {genre.name}
                   </SelectItem>
@@ -101,9 +101,9 @@ export default async function Home() {
           <Input type="text" placeholder="Year" value={filters.year} onChange={(e) => handleFilterChange(e.target.name, e.target.value)} />
         </div>
       </div>
-      <div className="mt-5 grid grid-cols-4 gap-3">
+      <div className="mt-12 grid grid-cols-4 gap-y-5 gap-x-7">
         {movieData ? (
-          movieData.results.map((movie: any) => (
+          movieData.results?.map((movie: any) => (
             <MovieCard
               key={movie.id}
               img={movie.poster_path}

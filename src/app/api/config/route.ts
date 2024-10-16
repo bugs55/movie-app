@@ -8,9 +8,12 @@ export async function GET() {
       .get<ConfigType>("https://api.themoviedb.org/3/configuration", {
         headers: { Authorization: auth },
       })
-      .then((res) => {res.data.images.base_url, res.data.images.secure_base_url})
+      .then((res) => ({
+          secure_base_url: res.data.images.secure_base_url,
+          base_url: res.data.images.base_url,
+      }))
   
-    return Response.json({ data });
+    return Response.json(data);
   } catch(err){
     console.error("Error fetching config:", err)
     return new Response("Error fetching config", { status: 500 });

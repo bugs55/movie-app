@@ -10,3 +10,8 @@ export type ConfigType = {
   };
   change_keys: string[];
 };
+
+export type ConfigUrlType = {
+  base_url: string;
+  secure_base_url: string;
+};

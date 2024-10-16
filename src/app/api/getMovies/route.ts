@@ -10,7 +10,7 @@ export async function GET() {
       })
       .then((res) => res.data);
   
-    return Response.json({ data });
+    return Response.json(data);
   } catch(err){
     console.error("Error fetching movies:", err);
     return new Response("Error fetching movies", { status: 500 });

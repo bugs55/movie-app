@@ -8,11 +8,11 @@ export async function GET() {
       .get<GenreDataType>("https://api.themoviedb.org/3/genre/movie/list", {
         headers: { Authorization: auth },
       })
-      .then((res) => res.data.genres)
+      .then((res) => res.data.genres);
 
-    return Response.json({ data }); 
+    return Response.json(data);
   } catch (error) {
-    console.error("Error fetching genres:", error); 
+    console.error("Error fetching genres:", error);
 
     return new Response("Error fetching genres", { status: 500 });
   }
