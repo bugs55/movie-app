@@ -3,7 +3,7 @@
 import Image from "next/image";
 import React from "react";
 import { Star } from "lucide-react";
-import { useApi } from "@/providers/useApi";
+import useSWR from "swr";
 
 type MovieCardProps = {
   img: string;
@@ -18,7 +18,7 @@ export default function MovieCard({
   title,
   description,
 }: MovieCardProps) {
-  const { data, error, isLoading } = useApi("/api/config");
+  const { data, error, isLoading } = useSWR("/api/config");
 
   return (
     <div>

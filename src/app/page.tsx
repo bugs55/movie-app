@@ -17,19 +17,18 @@ import { useState } from "react";
 
 type FilterType = {
   genre: string;
-  sortBys: string;
+  sortBy: string;
   year: string;
 };
 
 export default async function Home() {
   const [filters, setFilters] = useState<FilterType>({
     genre: "",
-    sortBys: "popularity.desc",
+    sortBy: "popularity.desc",
     year: "",
   });
 
-  function handleFilterChange(event: React.ChangeEvent<HTMLInputElement>): void {
-    const { name, value } = event.target;
+  function handleFilterChange(name: string, value: string | number): void {
     setFilters((prevFilters) => ({
       ...prevFilters,
       [name]: value,
@@ -52,7 +51,7 @@ export default async function Home() {
     <div className="px-5">
       <div className="w-full flex gap-2">
         <div>
-          <Select>
+          <Select name="genre" value={filters.genre} onValueChange={(value) => handleFilterChange("genre", value)}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Genre" />
             </SelectTrigger>
@@ -72,7 +71,7 @@ export default async function Home() {
           </Select>
         </div>
         <div>
-          <Select>
+          <Select name="sortBy" value={filters.sortBy} onValueChange={(value) => handleFilterChange("sortBys", value)}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
@@ -99,7 +98,7 @@ export default async function Home() {
           </Select>
         </div>
         <div className="w-[150px]">
-          <Input type="text" placeholder="Year" />
+          <Input type="text" placeholder="Year" value={filters.year} onChange={(e) => handleFilterChange(e.target.name, e.target.value)} />
         </div>
       </div>
       <div className="mt-5 grid grid-cols-4 gap-3">
