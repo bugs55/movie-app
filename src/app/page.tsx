@@ -16,16 +16,11 @@ import type { GenreType } from "@/types/getGenres.type";
 import { useState } from "react";
 import MovieCardLoading from "@/components/MovieCardLoading";
 import { Skeleton } from "@/components/ui/skeleton";
-
-type FilterType = {
-  genre: string;
-  sortBy: string;
-  year: string;
-};
+import type { FilterType } from "@/types/Filter.type";
 
 export default function Home() {
   const [filters, setFilters] = useState<FilterType>({
-    genre: "",
+    genre: "All",
     sortBy: "popularity.desc",
     year: "",
   });
@@ -37,19 +32,21 @@ export default function Home() {
     }));
   }
 
-  const fetcher = (url: string) => axios.get(url).then((res) => res.data);
+  const fetcherGenres = (url: string) => axios.get(url).then((res) => res.data);
+  const fetcherMovies = ([url, filters]: [string, FilterType]) =>
+    axios.post(url, filters).then((res) => res.data);
   const {
     data: movieData,
     error: movieError,
     isLoading: movieIsLoading,
-  } = useSWR<GetMoviesType>("/api/getMovies", fetcher, {
+  } = useSWR<GetMoviesType>(["/api/getMovies", filters], fetcherMovies, {
     revalidateOnFocus: false,
   });
   const {
     data: genresData,
     error: genresError,
     isLoading: genresIsLoading,
-  } = useSWR<GenreType[]>("/api/getGenres", fetcher, {
+  } = useSWR<GenreType[]>("/api/getGenres", fetcherGenres, {
     revalidateOnFocus: false,
   });
 
@@ -74,12 +71,12 @@ export default function Home() {
                   <SelectValue placeholder="Genre" />
                 </SelectTrigger>
                 <SelectContent>
-                  {genresData &&
-                    genresData?.map((genre) => (
-                      <SelectItem key={genre.id} value={`${genre.id}`}>
-                        {genre.name}
-                      </SelectItem>
-                    ))}
+                  <SelectItem value="All">All</SelectItem>
+                  {genresData.map((genre) => (
+                    <SelectItem key={genre.id} value={`${genre.id}`}>
+                      {genre.name}
+                    </SelectItem>
+                  ))}
                   <SelectItem value="popularity.asc">
                     Popularity ascending
                   </SelectItem>
@@ -90,7 +87,7 @@ export default function Home() {
               <Select
                 name="sortBy"
                 value={filters.sortBy}
-                onValueChange={(value) => handleFilterChange("sortBys", value)}
+                onValueChange={(value) => handleFilterChange("sortBy", value)}
               >
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Sort by" />

@@ -37,7 +37,7 @@ export default function MovieCard({
         </div>
         {isLoading ? (
           <Skeleton className="w-full h-[441px] rounded-md opacity-10" />
-        ) : error || !data ? (
+        ) : error || !data || !img ? (
           <div className="w-full h-[441px] rounded-md bg-white/20"></div>
         ) : (
           <Image
