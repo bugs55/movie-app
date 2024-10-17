@@ -1,4 +1,4 @@
-type Result = {
+export type Result = {
   poster_path: string | null;
   adult: boolean;
   overview: string;

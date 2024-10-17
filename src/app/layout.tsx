@@ -24,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${afacad.className} antialiased bg-movie-dark text-slate-200 w-screen h-screen`}
+        className={`${afacad.className} antialiased bg-movie-dark text-slate-200`}
       >
         <main className="container">
           <div className="px-5 w-full h-[80px] font-semibold text-movie-orange text-3xl flex items-center justify-between">

@@ -11,9 +11,11 @@ import {
 } from "@/components/ui/select";
 import axios from "axios";
 import useSWR from "swr";
-import type { GetMoviesType } from "@/types/getMovies.type";
+import type { GetMoviesType, Result } from "@/types/getMovies.type";
 import type { GenreType } from "@/types/getGenres.type";
 import { useState } from "react";
+import MovieCardLoading from "@/components/MovieCardLoading";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type FilterType = {
   genre: string;
@@ -40,80 +42,122 @@ export default function Home() {
     data: movieData,
     error: movieError,
     isLoading: movieIsLoading,
-  } = useSWR<GetMoviesType>("/api/getMovies", fetcher);
+  } = useSWR<GetMoviesType>("/api/getMovies", fetcher, {
+    revalidateOnFocus: false,
+  });
   const {
     data: genresData,
     error: genresError,
     isLoading: genresIsLoading,
-  } = useSWR<GenreType[]>("/api/getGenres", fetcher);
+  } = useSWR<GenreType[]>("/api/getGenres", fetcher, {
+    revalidateOnFocus: false,
+  });
 
   return (
     <div className="px-5">
       <div className="w-full flex gap-2">
-        <div>
-          <Select name="genre" value={filters.genre} onValueChange={(value) => handleFilterChange("genre", value)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Genre" />
-            </SelectTrigger>
-            <SelectContent>
-              {
-                genresData &&
-                genresData?.map((genre) => (
-                  <SelectItem key={genre.id} value={`${genre.id}`}>
-                    {genre.name}
+        {genresIsLoading ? (
+          <>
+            <Skeleton className="rounded-md w-[180px] h-[40px]" />
+            <Skeleton className="rounded-md w-[180px] h-[40px]" />
+            <Skeleton className="rounded-md w-[180px] h-[40px]" />
+          </>
+        ) : !genresError && genresData && genresData.length > 0 ? (
+          <>
+            <div>
+              <Select
+                name="genre"
+                value={filters.genre}
+                onValueChange={(value) => handleFilterChange("genre", value)}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Genre" />
+                </SelectTrigger>
+                <SelectContent>
+                  {genresData &&
+                    genresData?.map((genre) => (
+                      <SelectItem key={genre.id} value={`${genre.id}`}>
+                        {genre.name}
+                      </SelectItem>
+                    ))}
+                  <SelectItem value="popularity.asc">
+                    Popularity ascending
                   </SelectItem>
-                ))
-              }
-              <SelectItem value="popularity.asc">
-                Popularity ascending
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Select name="sortBy" value={filters.sortBy} onValueChange={(value) => handleFilterChange("sortBys", value)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="popularity.asc">
-                Popularity ascending
-              </SelectItem>
-              <SelectItem value="popularity.desc">
-                Popularity descending
-              </SelectItem>
-              <SelectItem value="vote_average.asc">
-                Vote average asceding
-              </SelectItem>
-              <SelectItem value="vote_average.desc">
-                Vote average descending
-              </SelectItem>
-              <SelectItem value="primary_release_date.asc">
-                Primary release date asceding
-              </SelectItem>
-              <SelectItem value="primary_release_date.desc">
-                Primary release date descending
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="w-[150px]">
-          <Input type="text" placeholder="Year" value={filters.year} onChange={(e) => handleFilterChange(e.target.name, e.target.value)} />
-        </div>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Select
+                name="sortBy"
+                value={filters.sortBy}
+                onValueChange={(value) => handleFilterChange("sortBys", value)}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="popularity.asc">
+                    Popularity ascending
+                  </SelectItem>
+                  <SelectItem value="popularity.desc">
+                    Popularity descending
+                  </SelectItem>
+                  <SelectItem value="vote_average.asc">
+                    Vote average asceding
+                  </SelectItem>
+                  <SelectItem value="vote_average.desc">
+                    Vote average descending
+                  </SelectItem>
+                  <SelectItem value="primary_release_date.asc">
+                    Primary release date asceding
+                  </SelectItem>
+                  <SelectItem value="primary_release_date.desc">
+                    Primary release date descending
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="w-[180px]">
+              <Input
+                type="text"
+                placeholder="Year"
+                value={filters.year}
+                onChange={(e) =>
+                  handleFilterChange(e.target.name, e.target.value)
+                }
+              />
+            </div>
+          </>
+        ) : null}
       </div>
       <div className="mt-12 grid grid-cols-4 gap-y-5 gap-x-7">
-        {movieData ? (
-          movieData.results?.map((movie: any) => (
-            <MovieCard
-              key={movie.id}
-              img={movie.poster_path}
-              rating={movie.vote_average}
-              title={movie.title}
-              description={movie.overview}
-            />
-          ))
+        {!movieIsLoading ? (
+          !movieError && movieData && movieData.results.length > 0 ? (
+            movieData.results?.map((movie: Result) => (
+              <MovieCard
+                key={movie.id}
+                img={movie.poster_path}
+                rating={movie.vote_average}
+                title={movie.title}
+                description={movie.overview}
+              />
+            ))
+          ) : (
+            <div className="text-center text-xl font-semibold">
+              No movies found
+            </div>
+          )
         ) : (
-          <div>No movies found</div>
+          <>
+            <MovieCardLoading />
+            <MovieCardLoading />
+            <MovieCardLoading />
+            <MovieCardLoading />
+            <MovieCardLoading />
+            <MovieCardLoading />
+            <MovieCardLoading />
+            <MovieCardLoading />
+          </>
         )}
       </div>
     </div>
