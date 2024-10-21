@@ -1,27 +1,12 @@
 import axios from "axios";
 import type { GetMoviesType } from "@/types/getMovies.type";
-import { FilterType } from "@/types/Filter.type";
-
-export async function GET() {
-  try{
-    const auth = `Bearer ${process.env.API_TOKEN}`;
-    const data = await axios
-      .get<GetMoviesType>("https://api.themoviedb.org/3/discover/movie", {
-        headers: { Authorization: auth },
-      })
-      .then((res) => res.data);
-  
-    return Response.json(data);
-  } catch(err){
-    console.error("Error fetching movies:", err);
-    return new Response("Error fetching movies", { status: 500 });
-  }
-}
+import type { FilterType } from "@/types/Filter.type";
+import type { ConfigType } from "@/types/ConfigType.type";
 
 export async function POST(request: Request) {
-  try{
+  try {
     const body: FilterType = await request.json();
-    const { genre, sortBy, year} = body;
+    const { genre, sortBy, year } = body;
 
     let query = `?sort_by=${sortBy}`;
     if (genre !== "All") {
@@ -33,13 +18,25 @@ export async function POST(request: Request) {
 
     const auth = `Bearer ${process.env.API_TOKEN}`;
     const data = await axios
-      .get<GetMoviesType>(`https://api.themoviedb.org/3/discover/movie${query}`, {
+      .get<GetMoviesType>(
+        `https://api.themoviedb.org/3/discover/movie${query}`,
+        {
+          headers: { Authorization: auth },
+        }
+      )
+      .then((res) => res.data);
+
+    const config = await axios
+      .get<ConfigType>("https://api.themoviedb.org/3/configuration", {
         headers: { Authorization: auth },
       })
-      .then((res) => res.data);
-  
-    return Response.json(data);
-  } catch(err){
+      .then((res) => ({
+        secure_base_url: res.data.images.secure_base_url,
+        base_url: res.data.images.base_url,
+      }));
+
+    return Response.json({ ...data, ...config });
+  } catch (err) {
     console.error("Error fetching movies:", err);
     return new Response("Error fetching movies", { status: 500 });
   }

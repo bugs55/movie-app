@@ -17,13 +17,18 @@ import { useState } from "react";
 import MovieCardLoading from "@/components/MovieCardLoading";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { FilterType } from "@/types/Filter.type";
+import type { ConfigUrlType } from "@/types/ConfigType.type";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 
 export default function Home() {
-  const [filters, setFilters] = useState<FilterType>({
+  const defaultFilters = {
     genre: "All",
     sortBy: "popularity.desc",
     year: "",
-  });
+  };
+
+  const [filters, setFilters] = useState<FilterType>(defaultFilters);
 
   function handleFilterChange(name: string, value: string | number): void {
     setFilters((prevFilters) => ({
@@ -39,9 +44,13 @@ export default function Home() {
     data: movieData,
     error: movieError,
     isLoading: movieIsLoading,
-  } = useSWR<GetMoviesType>(["/api/getMovies", filters], fetcherMovies, {
-    revalidateOnFocus: false,
-  });
+  } = useSWR<GetMoviesType & ConfigUrlType>(
+    ["/api/getMovies", filters],
+    fetcherMovies,
+    {
+      revalidateOnFocus: false,
+    }
+  );
   const {
     data: genresData,
     error: genresError,
@@ -124,19 +133,25 @@ export default function Home() {
                 }
               />
             </div>
+            <div>
+              <Button
+                variant="ghost"
+                onClick={() => setFilters(defaultFilters)}
+              >
+                <Trash2 size={20} /> Clear
+              </Button>
+            </div>
           </>
         ) : null}
       </div>
-      <div className="mt-12 grid grid-cols-4 gap-y-5 gap-x-7">
+      <div className="mt-12 grid grid-cols-4 gap-y-8 gap-x-7">
         {!movieIsLoading ? (
           !movieError && movieData && movieData.results.length > 0 ? (
             movieData.results?.map((movie: Result) => (
               <MovieCard
                 key={movie.id}
-                img={movie.poster_path}
-                rating={movie.vote_average}
-                title={movie.title}
-                description={movie.overview}
+                movie={movie}
+                secure_base_url={movieData.secure_base_url}
               />
             ))
           ) : (
