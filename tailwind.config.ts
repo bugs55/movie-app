@@ -15,6 +15,7 @@ const config: Config = {
         "movie-orange": "#ff8a00",
         "movie-orange-dark": "#F58300",
         "movie-dark": "#1A161C",
+        "movie-dark-lighter": "#3F3645",
       },
       borderRadius: {
         lg: "var(--radius)",

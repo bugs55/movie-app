@@ -21,6 +21,7 @@ import type { ConfigUrlType } from "@/types/ConfigType.type";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 import { PagesType } from "@/types/Pages.type";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export default function Home() {
   const defaultFilters: FilterType = {
@@ -36,6 +37,7 @@ export default function Home() {
 
   const [filters, setFilters] = useState<FilterType>(defaultFilters);
   const [pages, setPages] = useState<PagesType>(defaultPages);
+  const filtersDebounced = useDebounce<FilterType>(filters, 600);
 
   function handlePageChange(type: "previous" | "next"): void {
     setPages((prev) => ({
@@ -78,7 +80,7 @@ export default function Home() {
     error: movieError,
     isLoading: movieIsLoading,
   } = useSWR<GetMoviesType & ConfigUrlType>(
-    ["/api/getMovies", filters, pages.currentPage],
+    ["/api/getMovies", filtersDebounced, pages.currentPage],
     fetcherMovies,
     {
       revalidateOnFocus: false,
@@ -160,6 +162,7 @@ export default function Home() {
               <Input
                 type="text"
                 placeholder="Year"
+                name="year"
                 value={filters.year}
                 onChange={(e) =>
                   handleFilterChange(e.target.name, e.target.value)
@@ -177,7 +180,7 @@ export default function Home() {
           </>
         ) : null}
       </div>
-      <div className="mt-12 grid lg:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-y-8 gap-x-7">
+      <div className="mt-12 grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-y-8 gap-x-7">
         {!movieIsLoading ? (
           !movieError && movieData && movieData.results.length > 0 ? (
             movieData.results?.map((movie: Result) => (

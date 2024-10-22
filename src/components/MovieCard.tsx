@@ -5,6 +5,7 @@ import { Star } from "lucide-react";
 import { ConfigUrlType } from "@/types/ConfigType.type";
 import type { Result } from "@/types/getMovies.type";
 import { Button } from "./ui/button";
+import { Badge } from "./ui/badge";
 
 type MovieCardProps = {
   movie: Result;
@@ -16,7 +17,7 @@ export default function MovieCard({ movie, secure_base_url }: MovieCardProps) {
 
   return (
     <div>
-      <div className="w-full relative">
+      <div className="w-full relative cursor-pointer">
         <div className="absolute top-3 left-3 px-4 py-2 flex items-center gap-2 backdrop-blur bg-black/40 rounded-md">
           <Star color="#FFDE4D" size={20} />
           <div className="text-base font-semibold">
@@ -38,7 +39,11 @@ export default function MovieCard({ movie, secure_base_url }: MovieCardProps) {
       <div className="px-2 py-4">
         <div className="text-xl font-semibold line-clamp-2 mb-2">{title}</div>
         <div className="line-clamp-3">{overview}</div>
-        <Button className="w-full mt-4">Details</Button>
+        <div className="flex items-center gap-2 mt-3">
+          <Badge>Action</Badge>
+          <Badge>Fantasy</Badge>
+        </div>
+        <Button className="w-full mt-6">Details</Button>
       </div>
     </div>
   );
