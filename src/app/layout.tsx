@@ -29,7 +29,7 @@ export default function RootLayout({
         <main className="container">
           <div className="px-5 w-full h-[80px] font-semibold text-movie-orange text-3xl flex items-center justify-between">
             <Link href={"/"}>
-              <div className="flex gap-4 items-center">
+              <div className="flex gap-4 items-center whitespace-nowrap">
                 <MovieIcon fontSize={35} />
                 Movie Database
               </div>
