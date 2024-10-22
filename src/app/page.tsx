@@ -19,16 +19,39 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { FilterType } from "@/types/Filter.type";
 import type { ConfigUrlType } from "@/types/ConfigType.type";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import { PagesType } from "@/types/Pages.type";
 
 export default function Home() {
-  const defaultFilters = {
+  const defaultFilters: FilterType = {
     genre: "All",
     sortBy: "popularity.desc",
     year: "",
   };
 
+  const defaultPages: PagesType = {
+    currentPage: 1,
+    totalPages: 1,
+  };
+
   const [filters, setFilters] = useState<FilterType>(defaultFilters);
+  const [pages, setPages] = useState<PagesType>(defaultPages);
+
+  function handlePageChange(type: "previous" | "next"): void {
+    setPages((prev) => ({
+      ...prev,
+      currentPage:
+        type === "previous" ? prev.currentPage - 1 : prev.currentPage + 1,
+    }));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function setTotalPages(page: number): void {
+    setPages((prev) => ({
+      ...prev,
+      totalPages: page,
+    }));
+  }
 
   function handleFilterChange(name: string, value: string | number): void {
     setFilters((prevFilters) => ({
@@ -38,14 +61,24 @@ export default function Home() {
   }
 
   const fetcherGenres = (url: string) => axios.get(url).then((res) => res.data);
-  const fetcherMovies = ([url, filters]: [string, FilterType]) =>
-    axios.post(url, filters).then((res) => res.data);
+  const fetcherMovies = ([url, filters, currentPage]: [
+    string,
+    FilterType,
+    PagesType["currentPage"]
+  ]) =>
+    axios
+      .post<GetMoviesType & ConfigUrlType>(url, { filters, page: currentPage })
+      .then((res) => res.data)
+      .then((data) => {
+        setTotalPages(data.total_pages);
+        return data;
+      });
   const {
     data: movieData,
     error: movieError,
     isLoading: movieIsLoading,
   } = useSWR<GetMoviesType & ConfigUrlType>(
-    ["/api/getMovies", filters],
+    ["/api/getMovies", filters, pages.currentPage],
     fetcherMovies,
     {
       revalidateOnFocus: false,
@@ -144,7 +177,7 @@ export default function Home() {
           </>
         ) : null}
       </div>
-      <div className="mt-12 grid grid-cols-4 gap-y-8 gap-x-7">
+      <div className="mt-12 grid lg:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-y-8 gap-x-7">
         {!movieIsLoading ? (
           !movieError && movieData && movieData.results.length > 0 ? (
             movieData.results?.map((movie: Result) => (
@@ -171,6 +204,27 @@ export default function Home() {
             <MovieCardLoading />
           </>
         )}
+      </div>
+      <div className="mt-6 mb-4 flex justify-center items-center gap-5 text-sm">
+        <Button
+          variant="ghost"
+          disabled={pages.currentPage === 1}
+          onClick={() => handlePageChange("previous")}
+        >
+          <ChevronLeft size={20} />
+          Previous
+        </Button>
+        <div>
+          {pages.currentPage} / {pages.totalPages}
+        </div>
+        <Button
+          variant="ghost"
+          disabled={pages.currentPage === pages.totalPages}
+          onClick={() => handlePageChange("next")}
+        >
+          Next
+          <ChevronRight size={20} />
+        </Button>
       </div>
     </div>
   );

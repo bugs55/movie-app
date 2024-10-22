@@ -2,13 +2,20 @@ import axios from "axios";
 import type { GetMoviesType } from "@/types/getMovies.type";
 import type { FilterType } from "@/types/Filter.type";
 import type { ConfigType } from "@/types/ConfigType.type";
+import type { PagesType } from "@/types/Pages.type";
+
+type RequestBody = {
+  filters: FilterType;
+  page: PagesType["currentPage"];
+};
 
 export async function POST(request: Request) {
   try {
-    const body: FilterType = await request.json();
-    const { genre, sortBy, year } = body;
+    const body: RequestBody = await request.json();
+    const { genre, sortBy, year } = body.filters;
+    const page = body.page;
 
-    let query = `?sort_by=${sortBy}`;
+    let query = `?page=${page}&sort_by=${sortBy}`;
     if (genre !== "All") {
       query += `&with_genres=${genre}`;
     }
