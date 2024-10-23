@@ -1,8 +1,9 @@
 import axios from "axios";
-import type { GetMoviesType } from "@/types/getMovies.type";
+import type { GetMoviesType, Result } from "@/types/getMovies.type";
 import type { FilterType } from "@/types/Filter.type";
 import type { ConfigType } from "@/types/ConfigType.type";
 import type { PagesType } from "@/types/Pages.type";
+import type { GenreDataType } from "@/types/getGenres.type";
 
 type RequestBody = {
   filters: FilterType;
@@ -41,6 +42,29 @@ export async function POST(request: Request) {
         secure_base_url: res.data.images.secure_base_url,
         base_url: res.data.images.base_url,
       }));
+
+    const allGenres = await axios
+      .get<GenreDataType>("https://api.themoviedb.org/3/genre/movie/list", {
+        headers: { Authorization: auth },
+      })
+      .then((res) => res.data.genres);
+
+    let newResults: Result[] = [];
+
+    if (data.results.length > 0) {
+      newResults = data.results.map((movie) => {
+        const genreNames: string[] = movie.genre_ids.map((genreId) => {
+          const genre = allGenres.find((g) => g.id === genreId);
+          return genre ? genre.name : "";
+        });
+        return {
+          ...movie,
+          genres: genreNames,
+        };
+      });
+
+      data.results = newResults;
+    }
 
     return Response.json({ ...data, ...config });
   } catch (err) {

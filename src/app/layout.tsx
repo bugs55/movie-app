@@ -4,6 +4,7 @@ import "./globals.css";
 import MovieIcon from "@/icons/MovieIcon";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const afacad = Afacad({
   subsets: ["latin"],
@@ -27,7 +28,7 @@ export default function RootLayout({
         className={`${afacad.className} antialiased bg-movie-dark text-slate-200`}
       >
         <main className="container">
-          <div className="px-5 w-full h-[80px] font-semibold text-movie-orange text-3xl flex items-center justify-between">
+          <div className="px-5 w-full h-[80px] font-semibold text-movie-orange text-3xl flex items-center justify-between gap-4">
             <Link href={"/"}>
               <div className="flex gap-4 items-center whitespace-nowrap">
                 <MovieIcon fontSize={35} />
@@ -35,7 +36,13 @@ export default function RootLayout({
               </div>
             </Link>
             <div className="w-[300px]">
-              <Input type="text" placeholder="Search" />
+              <Button
+                variant="secondary"
+                size="sm"
+                className="flex justify-start w-full"
+              >
+                Search movie
+              </Button>
             </div>
           </div>
           {children}

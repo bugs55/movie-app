@@ -13,6 +13,7 @@ export type Result = {
   vote_count: number;
   video: boolean;
   vote_average: number;
+  genres?: string[];
 };
 
 export type GetMoviesType = {

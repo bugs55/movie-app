@@ -13,7 +13,7 @@ type MovieCardProps = {
 };
 
 export default function MovieCard({ movie, secure_base_url }: MovieCardProps) {
-  const { poster_path, vote_average, title, overview } = movie;
+  const { poster_path, vote_average, title, overview, genres } = movie;
 
   return (
     <div>
@@ -39,10 +39,13 @@ export default function MovieCard({ movie, secure_base_url }: MovieCardProps) {
       <div className="px-2 py-4">
         <div className="text-xl font-semibold line-clamp-2 mb-2">{title}</div>
         <div className="line-clamp-3">{overview}</div>
-        <div className="flex items-center gap-2 mt-3">
-          <Badge>Action</Badge>
-          <Badge>Fantasy</Badge>
-        </div>
+        {genres ? (
+          <div className="flex items-center flex-wrap gap-2 mt-3">
+            {genres.map((genre) => (
+              <Badge key={genre}>{genre}</Badge>
+            ))}
+          </div>
+        ) : null}
         <Button className="w-full mt-6">Details</Button>
       </div>
     </div>
