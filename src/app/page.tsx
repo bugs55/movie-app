@@ -13,13 +13,19 @@ import axios from "axios";
 import useSWR from "swr";
 import type { GetMoviesType, Result } from "@/types/getMovies.type";
 import type { GenreType } from "@/types/getGenres.type";
-import { useState } from "react";
+import { useState, useReducer, useEffect } from "react";
 import MovieCardLoading from "@/components/MovieCardLoading";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { FilterType } from "@/types/Filter.type";
 import type { ConfigUrlType } from "@/types/ConfigType.type";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import {
+  ChevronFirst,
+  ChevronLast,
+  ChevronLeft,
+  ChevronRight,
+  Trash2,
+} from "lucide-react";
 import { PagesType } from "@/types/Pages.type";
 import { useDebounce } from "@/hooks/useDebounce";
 
@@ -35,31 +41,74 @@ export default function Home() {
     totalPages: 1,
   };
 
+  function pagesReducer(
+    state: PagesType,
+    action: {
+      type:
+        | "previous"
+        | "next"
+        | "toFirst"
+        | "toLast"
+        | "setTotalPages"
+        | "clearPages";
+      payload?: PagesType["totalPages"];
+    }
+  ): PagesType {
+    switch (action.type) {
+      case "previous":
+        return {
+          ...state,
+          currentPage: state.currentPage - 1,
+        };
+      case "next":
+        return {
+          ...state,
+          currentPage: state.currentPage + 1,
+        };
+      case "toFirst":
+        return {
+          ...state,
+          currentPage: 1,
+        };
+      case "toLast":
+        return {
+          ...state,
+          currentPage: state.totalPages,
+        };
+      case "setTotalPages":
+        return {
+          ...state,
+          totalPages: action.payload || 1,
+        };
+      case "clearPages":
+        return defaultPages;
+      default:
+        return state;
+    }
+  }
+
   const [filters, setFilters] = useState<FilterType>(defaultFilters);
-  const [pages, setPages] = useState<PagesType>(defaultPages);
+  const [pages, dispatchPages] = useReducer(pagesReducer, defaultPages);
   const filtersDebounced = useDebounce<FilterType>(filters, 600);
+  const currentPageDebounced = useDebounce<PagesType["currentPage"]>(
+    pages.currentPage,
+    600
+  );
 
-  function handlePageChange(type: "previous" | "next"): void {
-    setPages((prev) => ({
-      ...prev,
-      currentPage:
-        type === "previous" ? prev.currentPage - 1 : prev.currentPage + 1,
-    }));
+  useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  function setTotalPages(page: number): void {
-    setPages((prev) => ({
-      ...prev,
-      totalPages: page,
-    }));
-  }
+  }, [pages]);
 
   function handleFilterChange(name: string, value: string | number): void {
     setFilters((prevFilters) => ({
       ...prevFilters,
       [name]: value,
     }));
+  }
+
+  function handleClearFilters(): void {
+    setFilters(defaultFilters);
+    dispatchPages({ type: "clearPages" });
   }
 
   const fetcherGenres = (url: string) => axios.get(url).then((res) => res.data);
@@ -72,7 +121,7 @@ export default function Home() {
       .post<GetMoviesType & ConfigUrlType>(url, { filters, page: currentPage })
       .then((res) => res.data)
       .then((data) => {
-        setTotalPages(data.total_pages);
+        dispatchPages({ type: "setTotalPages", payload: data.total_pages });
         return data;
       });
   const {
@@ -80,7 +129,7 @@ export default function Home() {
     error: movieError,
     isLoading: movieIsLoading,
   } = useSWR<GetMoviesType & ConfigUrlType>(
-    ["/api/getMovies", filtersDebounced, pages.currentPage],
+    ["/api/getMovies", filtersDebounced, currentPageDebounced],
     fetcherMovies,
     {
       revalidateOnFocus: false,
@@ -170,10 +219,7 @@ export default function Home() {
               />
             </div>
             <div>
-              <Button
-                variant="ghost"
-                onClick={() => setFilters(defaultFilters)}
-              >
+              <Button variant="ghost" onClick={() => handleClearFilters()}>
                 <Trash2 size={20} /> Clear
               </Button>
             </div>
@@ -191,7 +237,7 @@ export default function Home() {
               />
             ))
           ) : (
-            <div className="text-center text-xl font-semibold">
+            <div className="text-center text-xl font-semibold col-span-4">
               No movies found
             </div>
           )
@@ -209,25 +255,47 @@ export default function Home() {
         )}
       </div>
       <div className="mt-6 mb-4 flex justify-center items-center gap-5 text-sm">
-        <Button
-          variant="ghost"
-          disabled={pages.currentPage === 1}
-          onClick={() => handlePageChange("previous")}
-        >
-          <ChevronLeft size={20} />
-          Previous
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            disabled={pages.currentPage === 1}
+            onClick={() => dispatchPages({ type: "toFirst" })}
+            size="icon"
+          >
+            <ChevronFirst size={20} />
+          </Button>
+          <Button
+            variant="ghost"
+            disabled={pages.currentPage === 1}
+            onClick={() => dispatchPages({ type: "previous" })}
+            size="sm"
+          >
+            <ChevronLeft size={20} />
+            Previous
+          </Button>
+        </div>
         <div>
           {pages.currentPage} / {pages.totalPages}
         </div>
-        <Button
-          variant="ghost"
-          disabled={pages.currentPage === pages.totalPages}
-          onClick={() => handlePageChange("next")}
-        >
-          Next
-          <ChevronRight size={20} />
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            disabled={pages.currentPage === pages.totalPages}
+            onClick={() => dispatchPages({ type: "next" })}
+            size="sm"
+          >
+            Next
+            <ChevronRight size={20} />
+          </Button>
+          <Button
+            variant="ghost"
+            disabled={pages.currentPage === pages.totalPages}
+            onClick={() => dispatchPages({ type: "toLast" })}
+            size="icon"
+          >
+            <ChevronLast size={20} />
+          </Button>
+        </div>
       </div>
     </div>
   );
