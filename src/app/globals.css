@@ -17,3 +17,20 @@ body {
     --radius: 0.5rem;
   }
 }
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a161c;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(82 82 82);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(64 64 64);
+}
