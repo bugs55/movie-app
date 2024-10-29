@@ -24,7 +24,6 @@ import {
   ChevronLast,
   ChevronLeft,
   ChevronRight,
-  Filter,
   Trash2,
 } from "lucide-react";
 import { PagesType } from "@/types/Pages.type";
@@ -93,6 +92,7 @@ export default function Home() {
 
   const [filters, setFilters] = useState<FilterType>(defaultFilters);
   const [openMobileSearch, setOpenMobileSearch] = useState<boolean>(false);
+  const [openMobileFilters, setOpenMobileFilters] = useState<boolean>(false);
   const [pages, dispatchPages] = useReducer(pagesReducer, defaultPages);
   const filtersDebounced = useDebounce<FilterType>(filters, 600);
   const currentPageDebounced = useDebounce<PagesType["currentPage"]>(
@@ -247,7 +247,14 @@ export default function Home() {
           {/* <Button variant={"ghost"} size={"icon"}>
             <Filter size={20} />
           </Button> */}
-          <FilterDrawer />
+          <FilterDrawer
+            open={openMobileFilters}
+            setOpen={setOpenMobileFilters}
+            handleClearFilters={handleClearFilters}
+            handleFilterChange={handleFilterChange}
+            filters={filters}
+            genresData={genresData}
+          />
         </div>
       </div>
       <div className="mt-12 grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-y-8 gap-x-7">
