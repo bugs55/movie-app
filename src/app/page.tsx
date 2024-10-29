@@ -24,10 +24,14 @@ import {
   ChevronLast,
   ChevronLeft,
   ChevronRight,
+  Filter,
   Trash2,
 } from "lucide-react";
 import { PagesType } from "@/types/Pages.type";
 import { useDebounce } from "@/hooks/useDebounce";
+import { Search } from "lucide-react";
+import Searchbox from "@/components/Searchbox";
+import FilterDrawer from "@/components/FilterDrawer";
 
 export default function Home() {
   const defaultFilters: FilterType = {
@@ -88,6 +92,7 @@ export default function Home() {
   }
 
   const [filters, setFilters] = useState<FilterType>(defaultFilters);
+  const [openMobileSearch, setOpenMobileSearch] = useState<boolean>(false);
   const [pages, dispatchPages] = useReducer(pagesReducer, defaultPages);
   const filtersDebounced = useDebounce<FilterType>(filters, 600);
   const currentPageDebounced = useDebounce<PagesType["currentPage"]>(
@@ -145,7 +150,7 @@ export default function Home() {
 
   return (
     <div className="px-5">
-      <div className="w-full flex gap-2">
+      <div className="w-full md:flex hidden gap-2">
         {genresIsLoading ? (
           <>
             <Skeleton className="rounded-md w-[180px] h-[40px]" />
@@ -226,6 +231,25 @@ export default function Home() {
           </>
         ) : null}
       </div>
+      <div className="w-full md:hidden flex gap-2">
+        <div className="flex-1">
+          <Button
+            variant={"outline"}
+            size={"sm"}
+            className="w-full flex justify-start"
+            onClick={() => setOpenMobileSearch(true)}
+          >
+            <Search size={20} />
+            Search movie
+          </Button>
+        </div>
+        <div>
+          {/* <Button variant={"ghost"} size={"icon"}>
+            <Filter size={20} />
+          </Button> */}
+          <FilterDrawer />
+        </div>
+      </div>
       <div className="mt-12 grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-y-8 gap-x-7">
         {!movieIsLoading ? (
           !movieError && movieData && movieData.results.length > 0 ? (
@@ -297,6 +321,7 @@ export default function Home() {
           </Button>
         </div>
       </div>
+      <Searchbox open={openMobileSearch} setOpen={setOpenMobileSearch} />
     </div>
   );
 }

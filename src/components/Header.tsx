@@ -18,7 +18,7 @@ export default function Header() {
           Movie Database
         </div>
       </Link>
-      <div className="w-[300px]">
+      <div className="w-[300px] md:block hidden">
         <Button
           variant="outline"
           size="sm"
