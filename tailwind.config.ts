@@ -13,7 +13,7 @@ const config: Config = {
         background: "var(--background)",
         foreground: "var(--foreground)",
         "movie-orange": "#ff8a00",
-        "movie-orange-dark": "#F58300",
+        "movie-orange-dark": "#E07800",
         "movie-dark": "#1A161C",
         "movie-dark-lighter": "#3F3645",
       },

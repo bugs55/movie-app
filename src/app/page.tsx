@@ -244,9 +244,6 @@ export default function Home() {
           </Button>
         </div>
         <div>
-          {/* <Button variant={"ghost"} size={"icon"}>
-            <Filter size={20} />
-          </Button> */}
           <FilterDrawer
             open={openMobileFilters}
             setOpen={setOpenMobileFilters}
@@ -254,10 +251,11 @@ export default function Home() {
             handleFilterChange={handleFilterChange}
             filters={filters}
             genresData={genresData}
+            isLoadig={genresIsLoading}
           />
         </div>
       </div>
-      <div className="mt-12 grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-y-8 gap-x-7">
+      <div className="md:mt-12 mt-6 grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-y-8 gap-x-7">
         {!movieIsLoading ? (
           !movieError && movieData && movieData.results.length > 0 ? (
             movieData.results?.map((movie: Result) => (
