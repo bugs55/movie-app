@@ -10,6 +10,13 @@ import type { ConfigUrlType, ConfigType } from "@/types/ConfigType.type";
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { CreditsResponse } from "@/types/CreditsType.type";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 const Button = dynamic(() =>
   import("@/components/ui/button").then((m) => m.Button)
@@ -20,6 +27,7 @@ const ArrowLeft = dynamic(() =>
 const Star = dynamic(() => import("lucide-react").then((m) => m.Star));
 const Users = dynamic(() => import("lucide-react").then((m) => m.Users));
 const Rocket = dynamic(() => import("lucide-react").then((m) => m.Rocket));
+const User = dynamic(() => import("lucide-react").then((m) => m.User));
 
 type MoviePageParams = { params: Promise<{ id: string }> };
 type GetMovieDetailsResponse = GetMovieDetails &
@@ -83,12 +91,6 @@ export default async function MoviePage({ params }: MoviePageParams) {
   function getYear(date: string) {
     return date.split("-")[0];
   }
-
-  // const fetcher = (url: string) =>
-  //   axios.post(url, { id }).then((res) => res.data);
-  // const { data, isLoading, error } = useSWR<
-  //   GetMovieDetails & ConfigUrlType & { watch_providers: WatchProviders }
-  // >("/api/getMovieDetails", fetcher);
 
   return (
     <div className="px-5">
@@ -197,22 +199,60 @@ export default async function MoviePage({ params }: MoviePageParams) {
             <div className="mt-3">
               <div className="text-lg font-bold">Cast</div>
               <div className="flex flex-wrap gap-2 mt-1">
-                {data.credits.cast.map((cast) => (
-                  <div>
-                    <Image
-                      src={`${data.secure_base_url}w500${cast.profile_path}`}
-                      alt={cast.name}
-                      width={500}
-                      height={500}
-                      className="rounded-full w-20 h-20 object-cover"
-                    />
+                {/* {data.credits.cast.map((cast) => (
+                  <div key={cast.id} className="flex flex-col items-center">
+                    {cast.profile_path ? (
+                      <Image
+                        src={`${data.secure_base_url}w500${cast.profile_path}`}
+                        alt={cast.name}
+                        width={500}
+                        height={500}
+                        className="rounded-full w-20 h-20 object-cover"
+                      />
+                    ) : (
+                      <div className="rounded-full flex items-center justify-center w-20 h-20 bg-neutral-700">
+                        <User size={55} className="text-neutral-400" />
+                      </div>
+                    )}
                     <div className="text-sm">{cast.name}</div>
                     <div className="text-xs text-neutral-400">
                       {cast.character}
                     </div>
                   </div>
-                ))}
+                ))} */}
               </div>
+              <Carousel>
+                <CarouselContent>
+                  {data.credits.cast.map((cast) => (
+                    <CarouselItem
+                      key={cast.id}
+                      className="xl:basis-1/12 lg:basis-1/6 sm:basis-1/4 basis-1/3"
+                    >
+                      <div className="flex flex-col items-center">
+                        {cast.profile_path ? (
+                          <Image
+                            src={`${data.secure_base_url}w500${cast.profile_path}`}
+                            alt={cast.name}
+                            width={500}
+                            height={500}
+                            className="rounded-full w-20 h-20 object-cover"
+                          />
+                        ) : (
+                          <div className="rounded-full flex items-center justify-center w-20 h-20 bg-neutral-700">
+                            <User size={55} className="text-neutral-400" />
+                          </div>
+                        )}
+                        <div className="text-sm text-center">{cast.name}</div>
+                        <div className="text-xs text-neutral-400 text-center">
+                          {cast.character}
+                        </div>
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="lg:-left-8 -left-3 backdrop-blur bg-black/40" />
+                <CarouselNext className="lg:-right-8 -right-3 backdrop-blur bg-black/40" />
+              </Carousel>
             </div>
           ) : null}
         </div>

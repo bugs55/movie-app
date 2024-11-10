@@ -24,10 +24,20 @@ export default function RootLayout({
       <body
         className={`${afacad.className} antialiased bg-movie-dark text-slate-200`}
       >
-        <main className="container">
+        <main className="container min-h-screen">
           <Header />
           {children}
         </main>
+        <footer className="mt-6 flex justify-center items-center lg:h-16 h-12 bg-gray-950 text-slate-200">
+          &copy; Made by
+          <a
+            href="https://github.com/bugs55"
+            target="_blank"
+            className="font-bold underline ml-1"
+          >
+            Konrad Szczepanowski
+          </a>
+        </footer>
       </body>
     </html>
   );
