@@ -1,6 +1,8 @@
 # Movie Database 🍿📽️
 
-Simple project to discover movies and detailed informations about them. 
+Simple project to discover movies and detailed informations about them.
+
+[Live demo](https://moviedbapp55.netlify.app/)
 
 ## Features
 
