@@ -20,6 +20,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { ConfigUrlType } from "@/types/ConfigType.type";
 import Image from "next/image";
 import { Spinner } from "./ui/spinner";
+import Link from "next/link";
 
 type SearchProps = {
   open: boolean;
@@ -33,35 +34,44 @@ type FetcherArgs = {
 type MovieItemProps = {
   movie: Result;
   secure_base_url: ConfigUrlType["secure_base_url"];
+  setOpen: (open: boolean) => void;
 };
 
-function MovieItem({ movie, secure_base_url }: MovieItemProps) {
-  const { title, poster_path, overview, release_date } = movie;
+function MovieItem({ movie, secure_base_url, setOpen }: MovieItemProps) {
+  const { title, poster_path, overview, release_date, id } = movie;
 
   function getYear(date: string) {
     return date.split("-")[0];
   }
 
   return (
-    <CommandItem className="flex items-center gap-3">
-      <div className="w-[12%]">
-        {poster_path ? (
-          <Image
-            src={`${secure_base_url}w92${poster_path}`}
-            alt={title}
-            width={92}
-            height={138}
-            className="w-full rounded-md"
-          />
-        ) : (
-          <div className="w-full h-[110px] rounded-md bg-neutral-200/50"></div>
-        )}
-      </div>
-      <div className="flex flex-col w-[88%]">
-        <p className="text-base font-bold">{title}</p>
-        <p className="text-sm text-neutral-500 mb-1">{getYear(release_date)}</p>
-        <p className="text-base text-neutral-400 line-clamp-1">{overview}</p>
-      </div>
+    <CommandItem>
+      <Link href={`/movie/${id}`} onClick={() => setOpen(false)}>
+        <div className="flex items-center gap-3">
+          {poster_path ? (
+            <div className="w-[12%]">
+              <Image
+                src={`${secure_base_url}w92${poster_path}`}
+                alt={title}
+                width={92}
+                height={138}
+                className="w-full rounded-md"
+              />
+            </div>
+          ) : (
+            <div className="h-[84px] w-[54px] rounded-md bg-neutral-200/50"></div>
+          )}
+          <div className={`flex flex-col ${poster_path ? "w-[88%]" : null}`}>
+            <p className="text-base font-bold">{title}</p>
+            <p className="text-sm text-neutral-500 mb-1">
+              {getYear(release_date)}
+            </p>
+            <p className="text-base text-neutral-400 line-clamp-1">
+              {overview}
+            </p>
+          </div>
+        </div>
+      </Link>
     </CommandItem>
   );
 }
@@ -119,6 +129,7 @@ export default function Searchbox({ open, setOpen }: SearchProps) {
                   key={movie.id}
                   movie={movie}
                   secure_base_url={data.secure_base_url}
+                  setOpen={setOpen}
                 />
               ))}
             </CommandGroup>
@@ -139,6 +150,7 @@ export default function Searchbox({ open, setOpen }: SearchProps) {
                   key={movie.id}
                   movie={movie}
                   secure_base_url={suggestData.secure_base_url}
+                  setOpen={setOpen}
                 />
               ))}
             </CommandGroup>
