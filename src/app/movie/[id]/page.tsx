@@ -1,11 +1,8 @@
-// import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
 import { GetMovieDetails, WatchProviders } from "@/types/getMovieDetails.type";
 import axios from "axios";
-// import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-// import useSWR from "swr";
 import type { ConfigUrlType, ConfigType } from "@/types/ConfigType.type";
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +14,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { getGenres } from "@/actions/getGenres";
 
 const Button = dynamic(() =>
   import("@/components/ui/button").then((m) => m.Button)
