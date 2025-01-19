@@ -1,6 +1,6 @@
 import axios from "axios";
 import type { GetMoviesType } from "@/types/getMovies.type";
-import type { ConfigUrlType, ConfigType } from "@/types/ConfigType.type";
+import type { ConfigType } from "@/types/ConfigType.type";
 
 type RequestBody = {
   search: string;

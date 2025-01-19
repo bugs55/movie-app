@@ -1,11 +1,8 @@
-// import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
 import { GetMovieDetails, WatchProviders } from "@/types/getMovieDetails.type";
 import axios from "axios";
-// import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-// import useSWR from "swr";
 import type { ConfigUrlType, ConfigType } from "@/types/ConfigType.type";
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +14,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { getMovieDetails } from "@/actions/getMovieDetails";
 
 const Button = dynamic(() =>
   import("@/components/ui/button").then((m) => m.Button)
@@ -35,46 +33,6 @@ type GetMovieDetailsResponse = GetMovieDetails &
     watch_providers: WatchProviders["results"];
     credits: CreditsResponse;
   };
-
-async function getMovieDetails(id: string): Promise<GetMovieDetailsResponse> {
-  const auth = `Bearer ${process.env.API_TOKEN}`;
-  const data = await axios
-    .get<GetMovieDetails>(`https://api.themoviedb.org/3/movie/${id}`, {
-      headers: { Authorization: auth },
-    })
-    .then((res) => res.data);
-
-  const config = await axios
-    .get<ConfigType>("https://api.themoviedb.org/3/configuration", {
-      headers: { Authorization: auth },
-    })
-    .then((res) => ({
-      secure_base_url: res.data.images.secure_base_url,
-      base_url: res.data.images.base_url,
-    }));
-
-  const watchProviders = await axios
-    .get<WatchProviders>(
-      `https://api.themoviedb.org/3/movie/${id}/watch/providers`,
-      {
-        headers: { Authorization: auth },
-      }
-    )
-    .then((res) => res.data);
-
-  const credits = await axios
-    .get<CreditsResponse>(`https://api.themoviedb.org/3/movie/${id}/credits`, {
-      headers: { Authorization: auth },
-    })
-    .then((res) => res.data);
-
-  return {
-    ...data,
-    ...config,
-    watch_providers: watchProviders.results,
-    credits,
-  };
-}
 
 export default async function MoviePage({ params }: MoviePageParams) {
   const id = (await params).id;
@@ -105,10 +63,9 @@ export default async function MoviePage({ params }: MoviePageParams) {
           {data && data.backdrop_path ? (
             <Image
               src={`${data.secure_base_url}w1280${data.backdrop_path}`}
-              width={1280}
-              height={720}
               alt={data.title}
               className="rounded-md object-cover w-full h-full"
+              fill
             />
           ) : (
             <div className="w-full h-full bg-neutral-700 rounded-md"></div>
